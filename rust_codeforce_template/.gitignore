@@ -1,0 +1,15 @@
+/target
+Cargo.lock
+*.swp
+.idea
+
+# Test
+generator
+/test.in
+
+#Backup
+/backup
+
+
+
+/rust_bundler_cp
