@@ -24,8 +24,6 @@ mod test_multi_queue {
     }
 }
 
-
-
 #[cfg(test)]
 #[path = "../src"]
 mod test_algo {
@@ -42,10 +40,8 @@ mod test_algo {
         assert_eq!(calculate_array_inversions(v), 15);
         let v = &[0, 25, 33, 6, 45, 8, 21, 16, 9, 10, 39, 22, 11, 18, 1, 12, 47, 32, 5, 20, 17, 28, 27, 26, 48, 7, 14, 38, 43, 30, 19, 36, 29, 42, 15, 23, 13, 34, 37, 40, 41, 44, 24, 46, 31, 4, 3, 2, 35, 49];
         assert_eq!(calculate_array_inversions(v), 482);
-
     }
 }
-
 
 #[cfg(test)]
 #[path = "../src"]
@@ -54,7 +50,7 @@ mod test_nums {
 
     #[test]
     fn test_pow() {
-        const MODULO:i32 = 998244353;
+        const MODULO: i32 = 998244353;
         let v = pow_mod(2, 10, MODULO);
         assert_eq!(v, 1024);
 
@@ -65,7 +61,6 @@ mod test_nums {
         assert_eq!(v, 807568023);
     }
 
-
     use my_lib::nums::represent_into_bits;
     #[test]
     fn test_represent_into_bits() {
@@ -74,21 +69,20 @@ mod test_nums {
         let ev = [0u8, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         assert_eq!(v, ev);
         let s = represent_from_bits(&v);
-        assert_eq!(x,s);
-
+        assert_eq!(x, s);
 
         let x = 7;
         let v = represent_into_bits(x);
         let ev = [1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         assert_eq!(v, ev);
         let s = represent_from_bits(&v);
-        assert_eq!(x,s);
+        assert_eq!(x, s);
 
-        let x = (1u64<<60) + 3;
+        let x = (1u64 << 60) + 3;
         let v = represent_into_bits(x);
         let ev = [1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0];
         assert_eq!(v, ev);
         let s = represent_from_bits(&v);
-        assert_eq!(x,s);
+        assert_eq!(x, s);
     }
 }

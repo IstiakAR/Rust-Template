@@ -255,6 +255,18 @@ pub mod multi_queue;
 pub mod nums;
 
 pub mod iters;
+pub mod cheatsheet;
+pub mod memorize;
+
+pub mod caching;
+pub mod graph;
+pub mod li_chao;
+pub mod math;
+pub mod order;
+pub mod range_query;
+pub mod rng;
+pub mod scanner;
+pub mod string_proc;
 
 // ====================
 

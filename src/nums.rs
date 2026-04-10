@@ -40,22 +40,8 @@ pub fn multi_mod(x:i32, y:i32, modulo:i32) -> i32 {
 
 #[allow(dead_code)]
 pub fn pow_mod(base: i32, exp:u32, modulo:i32) -> i32 {
-    let mut answer:i64 = 1;
-    if exp > 10 {
-        //Todo: Move to non-recursive
-        let sub_exp = exp / 2;
-        let mut p:i64 = pow_mod(base, sub_exp, modulo) as i64;
-        p = p as i64 * p as i64 % modulo as i64;
-        if exp % 2 == 1 {
-            p = p * base as i64 % modulo as i64;
-        }
-        return p as i32;
-    }
-    for _ in 0..exp{
-        answer *= base as i64;
-        answer %= modulo as i64;
-    }
-    answer as i32
+    assert!(modulo > 0);
+    crate::math::mod_exp(base as i64, exp as u64, modulo as i64) as i32
 }
 
 //should be generic

@@ -36,7 +36,7 @@ fn pos_mod(n: i64, m: i64) -> i64 {
 fn mod_mul(a: i64, b: i64, m: i64) -> i64 {
     pos_mod((a as i128 * b as i128 % m as i128) as i64, m)
 }
-fn mod_exp(mut base: i64, mut exp: u64, m: i64) -> i64 {
+pub fn mod_exp(mut base: i64, mut exp: u64, m: i64) -> i64 {
     assert!(m >= 1);
     let mut ans = 1 % m;
     base %= m;

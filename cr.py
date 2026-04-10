@@ -8,10 +8,12 @@ import os
 import sys
 import time
 import platform
+import re
+import shutil
 
 RUST_VERSION = "1.85.1" # As of 2025-05-16, Kattis
 BUNDLER = "rust_bundler_cp"
-STRIP_OUTPUT = " "
+STRIP_OUTPUT = ""
 BLEEDING = False
 
 
@@ -25,6 +27,7 @@ TEMP_DIRECTORY = check_temporary_path()
 BACKUP_DIRECTORY = "backup"
 RS_FILE_DIRECTORY = "src/bin/"
 TEMPLATE_RS_FILE_NAME = "_template.rs"
+CARGO_TOML = "Cargo.toml"
 
 
 def get_time_str():
@@ -39,24 +42,43 @@ def check_rust_toolkit():
         # Use WSL to skip it is a bit hacky
         print("Skipped rust version enforce")
         return
+    if not shutil.which("rustup"):
+        print("rustup not found; skipped rust version enforce")
+        return
     subprocess.run(["rustup", "default", RUST_VERSION])
 
 
 def check_valid_cargo_directory():
     x = os.listdir()
-    if 'Cargo.toml' not in x:
+    if CARGO_TOML not in x:
         print("Not a cargo project. Aborting")
         exit(1)
 
 
+def get_rust_edition() -> str:
+    with open(CARGO_TOML, "r", encoding="utf-8") as f:
+        cargo = f.read()
+    # Read the first edition declaration in Cargo.toml.
+    match = re.search(r'(?m)^\s*edition\s*=\s*"(\d{4})"\s*$', cargo)
+    if match:
+        return match.group(1)
+    # Keep 2021 as a practical fallback for contest compatibility.
+    return "2021"
+
+
 def bundle(binary) -> str:
     output_path = TEMP_DIRECTORY + "/problem_" + binary + "_" + BUNDLING_TIME
-    subprocess.run([BUNDLER, "--input", ".", "--binary", binary, STRIP_OUTPUT, "--output", output_path + ".rs"])
+    cmd = [BUNDLER, "--input", ".", "--binary", binary]
+    if STRIP_OUTPUT:
+        cmd.append(STRIP_OUTPUT)
+    cmd.extend(["--output", output_path + ".rs"])
+    subprocess.run(cmd, check=True)
     return output_path
 
 
 def compile_rs(rs_file):
-    subprocess.run(["rustc", rs_file + ".rs", "-o", rs_file])
+    edition = get_rust_edition()
+    subprocess.run(["rustc", "--edition", edition, rs_file + ".rs", "-o", rs_file], check=True)
 
 
 def reset_workspace():
@@ -100,7 +122,7 @@ def main():
         binary = sys.argv[1]
     rs_file = bundle(binary)
     compile_rs(rs_file)
-    subprocess.run([rs_file])
+    subprocess.run([rs_file], check=True)
 
 
 main()

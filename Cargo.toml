@@ -1,8 +1,11 @@
 [package]
 name = "rust_codeforce_template"
-version = "0.1.1"
-authors = ["Zhenbo Li <litimetal@gmail.com>"]
-edition = "2021"
+version = "0.3.1-merged"
+authors = ["Zhenbo Li <litimetal@gmail.com>", "Aram Ebtekar"]
+edition = "2024"
+
+description = "Merged competitive programming template plus algorithms/data structures"
+license = "MIT"
 
 [lib]
 name = "my_lib"
@@ -14,33 +17,33 @@ path = "src/bin/main.rs"
 [[bin]]
 name = "a"
 path = "src/bin/a.rs"
+
 [[bin]]
 name = "b"
 path = "src/bin/b.rs"
+
 [[bin]]
 name = "c"
 path = "src/bin/c.rs"
+
 [[bin]]
 name = "d"
 path = "src/bin/d.rs"
+
 [[bin]]
 name = "e"
 path = "src/bin/e.rs"
+
 [[bin]]
 name = "f"
 path = "src/bin/f.rs"
+
 [[bin]]
 name = "g"
 path = "src/bin/g.rs"
 
-
-#[dependencies]
+[dependencies]
+text_io = "0.1.13"
 
 [dev-dependencies]
 rand = "0.8.4"
-
-criterion = "0.3.4"
-
-[[bench]]
-name = "bench_algo"
-harness = false
