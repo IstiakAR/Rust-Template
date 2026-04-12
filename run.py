@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
-# Compile and Run (with rust_bundler_cp)
-# MIT LICENSE. Zhenbo Li
+# python run.py [binary_name]
 
 import subprocess
 import os
@@ -11,15 +10,16 @@ import platform
 import re
 import shutil
 
-RUST_VERSION = "1.85.1" # As of 2025-05-16, Kattis
+RUST_VERSION = "1.85.1"
 BUNDLER = "rust_bundler_cp"
-STRIP_OUTPUT = ""
+STRIP_OUTPUT = "--remove_unused_mod"
 BLEEDING = False
 
 
 def check_temporary_path():
-    if 'WSL' in platform.uname()[2]: return "../../../Downloads"
-    else: return "/dev/shm"
+    if not os.path.exists("./result"):
+        os.makedirs("./result")
+    return "./result"
 
 
 TEMP_DIRECTORY = check_temporary_path()
@@ -38,10 +38,6 @@ BUNDLING_TIME = get_time_str()
 
 
 def check_rust_toolkit():
-    if 'WSL' in platform.uname()[2]:
-        # Use WSL to skip it is a bit hacky
-        print("Skipped rust version enforce")
-        return
     if not shutil.which("rustup"):
         print("rustup not found; skipped rust version enforce")
         return
@@ -58,21 +54,34 @@ def check_valid_cargo_directory():
 def get_rust_edition() -> str:
     with open(CARGO_TOML, "r", encoding="utf-8") as f:
         cargo = f.read()
-    # Read the first edition declaration in Cargo.toml.
     match = re.search(r'(?m)^\s*edition\s*=\s*"(\d{4})"\s*$', cargo)
     if match:
         return match.group(1)
-    # Keep 2021 as a practical fallback for contest compatibility.
     return "2021"
 
 
 def bundle(binary) -> str:
     output_path = TEMP_DIRECTORY + "/problem_" + binary + "_" + BUNDLING_TIME
+    os.makedirs(TEMP_DIRECTORY, exist_ok=True)
     cmd = [BUNDLER, "--input", ".", "--binary", binary]
     if STRIP_OUTPUT:
         cmd.append(STRIP_OUTPUT)
     cmd.extend(["--output", output_path + ".rs"])
-    subprocess.run(cmd, check=True)
+
+    try:
+        subprocess.run(cmd, check=True)
+    except subprocess.CalledProcessError:
+        if STRIP_OUTPUT:
+            print("Bundler retry without --remove_unused_mod")
+            fallback = [BUNDLER, "--input", ".", "--binary", binary, "--output", output_path + ".rs"]
+            subprocess.run(fallback, check=True)
+        else:
+            raise
+
+    char_count = os.path.getsize(output_path + ".rs")
+    print(f"Bundled source size: {char_count} chars")
+    if char_count > 65535:
+        print("WARNING: exceeds 65535-char limit")
     return output_path
 
 
@@ -96,22 +105,10 @@ def reset_workspace():
     exit(0)
 
 
-def check_bleeding_edge_bundler():
-    global BUNDLER
-    global BLEEDING
-    global STRIP_OUTPUT
-    bleed = "./" + BUNDLER
-    if os.path.exists(bleed):
-        print("Using bleeding edge bundler")
-        BUNDLER = bleed
-        BLEEDING = True
-        STRIP_OUTPUT = "--remove_unused_mod"
-
 
 def main():
     check_rust_toolkit()
     check_valid_cargo_directory()
-    check_bleeding_edge_bundler()
 
     binary = "rust_codeforce_template"
 

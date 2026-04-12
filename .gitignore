@@ -4,3 +4,6 @@ Cargo.lock
 .idea/
 .vscode/
 *.code-workspace
+result/*.rs
+result/problem*
+__pycache__/
