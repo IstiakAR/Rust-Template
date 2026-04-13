@@ -7,42 +7,6 @@
 
 // pub mod iters;
 
-
-
-// ==== BELOW IS text_io https://github.com/oli-obk/rust-si ====
-// Version 0.1.11
-// Tried to put text_io in a module, but failed for exporting macros
-//! This crate allows one-liners to read from a terminal
-//! A minimal example to get an i32 from the command line is
-//!
-//! ```rust,no_run
-//! use text_io::read;
-//!
-//! fn main() {
-//!     let i: i32 = read!();
-//! }
-//! ```
-//!
-//! The `read!()` macro will always read until the next ascii whitespace character
-//! (`\n`, `\r`, `\t` or space).
-//!
-//! Any type that implements the `FromStr` trait can be read with the `read!` macro.
-//!
-//! # Advanced
-//! Text parsing can be done similar to `println!` by adding a format string
-//! to the macro:
-//!
-//! ```rust,no_run
-//! use text_io::read;
-//!
-//! let i: i32 = read!("The answer: {}!");
-//! ```
-//!
-//! This will read `"The answer: "`, then an integer, then an exclamation mark. Any deviation from
-//! the format string will result in a panic.
-//!
-//! Note: only a single value can be read per `read!` invocation.
-
 use std::error;
 use std::fmt;
 use std::str::FromStr;
@@ -250,21 +214,13 @@ macro_rules! scan(
 
 pub mod pr;
 pub mod algo;
-pub mod nd;
-pub mod multi_queue;
+pub mod special;
+pub use special::{caching, cheatsheet, iters, li_chao, multi_queue, nd};
 pub mod nums;
-
-pub mod iters;
-pub mod cheatsheet;
-pub mod memorize;
-
-pub mod caching;
 pub mod graph;
-pub mod li_chao;
 pub mod math;
 pub mod order;
 pub mod range_query;
-pub mod rng;
 pub mod scanner;
 pub mod string_proc;
 

@@ -1,7 +1,3 @@
-/*
-Some code are not proper to be used added a library. Put cheatsheet here
-*/
-
 
 use std::cmp::Ordering;
 use std::collections::BinaryHeap;
