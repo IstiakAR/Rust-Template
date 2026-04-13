@@ -1,4 +1,5 @@
 pub mod dynamic_arq;
+pub mod fenwick;
 pub mod specs;
 pub mod sqrt_decomp;
 pub mod static_arq;

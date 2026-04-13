@@ -40,6 +40,89 @@ impl DisjointSets {
     }
 }
 
+/// Disjoint set union (union-find) with rollback support.
+///
+/// This variant does not use path compression so previous states can be restored.
+pub struct RollbackDisjointSets {
+    parent: Vec<usize>,
+    size: Vec<usize>,
+    num_components: usize,
+    history: Vec<Option<(usize, usize, usize)>>,
+}
+
+impl RollbackDisjointSets {
+    /// Initializes disjoint sets containing one element each.
+    pub fn new(size: usize) -> Self {
+        Self {
+            parent: (0..size).collect(),
+            size: vec![1; size],
+            num_components: size,
+            history: vec![],
+        }
+    }
+
+    /// Finds the representative of u.
+    pub fn find(&self, mut u: usize) -> usize {
+        while self.parent[u] != u {
+            u = self.parent[u];
+        }
+        u
+    }
+
+    /// Returns true if u and v are in the same component.
+    pub fn connected(&self, u: usize, v: usize) -> bool {
+        self.find(u) == self.find(v)
+    }
+
+    /// Merges the sets containing u and v. Returns true if merged.
+    pub fn merge(&mut self, u: usize, v: usize) -> bool {
+        let mut pu = self.find(u);
+        let mut pv = self.find(v);
+        if pu == pv {
+            self.history.push(None);
+            return false;
+        }
+        if self.size[pu] < self.size[pv] {
+            std::mem::swap(&mut pu, &mut pv);
+        }
+
+        let size_pu = self.size[pu];
+        self.parent[pv] = pu;
+        self.size[pu] += self.size[pv];
+        self.num_components -= 1;
+        self.history.push(Some((pv, pu, size_pu)));
+        true
+    }
+
+    /// Saves current DSU history pointer for later rollback.
+    pub fn snapshot(&self) -> usize {
+        self.history.len()
+    }
+
+    /// Rolls back to the given snapshot pointer.
+    pub fn rollback(&mut self, snapshot: usize) {
+        assert!(snapshot <= self.history.len());
+        while self.history.len() > snapshot {
+            if let Some((child, parent, size_parent_before)) =
+                self.history.pop().expect("history length checked")
+            {
+                self.parent[child] = child;
+                self.size[parent] = size_parent_before;
+                self.num_components += 1;
+            }
+        }
+    }
+
+    /// Returns the size of u's component.
+    pub fn component_size(&self, u: usize) -> usize {
+        self.size[self.find(u)]
+    }
+
+    pub fn num_components(&self) -> usize {
+        self.num_components
+    }
+}
+
 /// A compact graph representation. Edges are numbered in order of insertion.
 /// Each adjacency list consists of all edges pointing out from a given vertex.
 pub struct Graph {
@@ -127,6 +210,32 @@ impl Iterator for AdjListIterator<'_> {
 #[cfg(test)]
 mod test {
     use super::*;
+
+    #[test]
+    fn test_rollback_dsu() {
+        let mut dsu = RollbackDisjointSets::new(6);
+        let snap0 = dsu.snapshot();
+
+        assert_eq!(dsu.num_components(), 6);
+        assert!(dsu.merge(0, 1));
+        assert!(dsu.merge(2, 3));
+        let snap1 = dsu.snapshot();
+
+        assert!(!dsu.connected(0, 2));
+        assert!(dsu.merge(1, 2));
+        assert!(dsu.connected(0, 3));
+        assert_eq!(dsu.component_size(3), 4);
+
+        dsu.rollback(snap1);
+        assert!(dsu.connected(0, 1));
+        assert!(dsu.connected(2, 3));
+        assert!(!dsu.connected(1, 2));
+        assert_eq!(dsu.num_components(), 4);
+
+        dsu.rollback(snap0);
+        assert_eq!(dsu.num_components(), 6);
+        assert_eq!(dsu.component_size(0), 1);
+    }
 
     #[test]
     fn test_adj_list() {
